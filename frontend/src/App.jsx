@@ -1,3 +1,4 @@
+import './assets/styles.css';
 import { useState } from 'react';
 
 function App() {
