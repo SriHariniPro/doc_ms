@@ -1,0 +1,15 @@
+.hero-pattern {
+  background-color: #f8fafc;
+  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.feature-card {
+  @apply bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow
+         cursor-pointer flex flex-col items-center text-center;
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease-in-out;
+} 
