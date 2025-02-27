@@ -29,13 +29,7 @@ const Extract = () => {
     const file = event.target.files[0];
     if (file) {
       setSelectedFile(file);
-      setErrorMessage("");
-
-      if (file.type.startsWith("image/")) {
-        setFilePreview(URL.createObjectURL(file));
-      } else {
-        setFilePreview(null);
-      }
+      setFilePreview(URL.createObjectURL(file));
     }
   };
 
@@ -43,49 +37,9 @@ const Extract = () => {
     if (!selectedFile) return;
     
     setLoading(true);
-    setErrorMessage("");
-    
     try {
-      const fileType = selectedFile.type;
-      let extractedText = "";
-
-      if (fileType.startsWith("image/")) {
-        const { data } = await Tesseract.recognize(selectedFile, "eng");
-        extractedText = data.text;
-      } else if (fileType === "application/pdf") {
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(selectedFile);
-        extractedText = await new Promise((resolve, reject) => {
-          reader.onload = async () => {
-            try {
-              const text = await pdfParse(reader.result);
-              resolve(text.text);
-            } catch (error) {
-              reject("Error processing PDF.");
-            }
-          };
-          reader.onerror = () => reject("Failed to read the file.");
-        });
-      } else if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(selectedFile);
-        extractedText = await new Promise((resolve, reject) => {
-          reader.onload = async () => {
-            try {
-              const text = await mammoth.extractRawText({ arrayBuffer: reader.result });
-              resolve(text.value);
-            } catch (error) {
-              reject("Error processing DOCX.");
-            }
-          };
-          reader.onerror = () => reject("Failed to read the file.");
-        });
-      } else {
-        setErrorMessage("Unsupported file type. Please upload an image, PDF, or DOCX file.");
-        setLoading(false);
-        return;
-      }
-
+      const { data } = await Tesseract.recognize(selectedFile, "eng");
+      const extractedText = data.text;
       const metadata = extractMetadata(extractedText);
 
       setOcrResult([
@@ -95,8 +49,8 @@ const Extract = () => {
         { title: "Amounts", content: metadata.amounts.join(", ") || "None", icon: CheckCircle },
       ]);
     } catch (error) {
-      setErrorMessage("An error occurred during processing.");
       console.error("OCR Error:", error);
+      setErrorMessage("An error occurred while processing the OCR. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -113,7 +67,7 @@ const Extract = () => {
             <div className="w-full text-center">
               <input 
                 type="file" 
-                accept="image/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+                accept="image/*" 
                 onChange={handleFileChange} 
                 className="hidden" 
                 id="file-upload" 
@@ -123,7 +77,7 @@ const Extract = () => {
                 className="btn-primary cursor-pointer inline-flex items-center space-x-2"
               >
                 <Upload className="w-5 h-5" />
-                <span>Upload File</span>
+                <span>Upload Image</span>
               </label>
             </div>
 
@@ -134,13 +88,6 @@ const Extract = () => {
                   alt="Preview" 
                   className="w-full h-64 object-cover rounded-lg shadow-lg"
                 />
-              </div>
-            )}
-
-            {errorMessage && (
-              <div className="text-red-500 flex items-center space-x-2">
-                <XCircle className="w-5 h-5" />
-                <span>{errorMessage}</span>
               </div>
             )}
 
@@ -181,10 +128,16 @@ const Extract = () => {
               ))}
             </div>
           )}
+
+          {errorMessage && (
+            <div className="mt-8 text-center text-red-500">
+              {errorMessage}
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default Extract;
+export default Extract; 
