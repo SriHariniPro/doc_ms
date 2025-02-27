@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Tesseract from "tesseract.js";
 import { Upload, FileText, CheckCircle, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
 
 const Extract = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -90,4 +90,4 @@ const Extract = () => {
   );
 };
 
-export default Extract;
+export default Extract; 
