@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './components/Home/Home';
+import { FileIcon, FileTypeIcon } from './components/DocumentUpload/FileIcons';
 
 function App() {
   const [files, setFiles] = useState([]);
@@ -62,7 +64,7 @@ function App() {
     handleFileUpload({ target: { files: droppedFiles } });
   };
 
-  return (
+  const UploadComponent = () => (
     <div className="min-h-screen hero-pattern">
       {/* Upload Section */}
       <div 
@@ -148,6 +150,15 @@ function App() {
       </div>
     </div>
   );
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/upload" element={<UploadComponent />} />
+      </Routes>
+    </Router>
+  );
 }
 
 // File Icon Component
@@ -177,7 +188,7 @@ function FileIcon({ fileType }) {
   );
 }
 
-// Add a new component for file type icons
+// File Type Icon Component
 function FileTypeIcon({ type }) {
   const icons = {
     pdf: "📄",
