@@ -1,0 +1,101 @@
+/* Main container for files */
+.file-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Individual file category */
+.file-category {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Category title */
+.file-category h2 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* Flex container for files */
+.file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: flex-start;
+}
+
+/* Individual file card */
+.file-card {
+  width: 220px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-card:hover {
+  transform: translateY(-3px);
+}
+
+/* File icon */
+.file-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+/* File details */
+.file-details {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.file-details p {
+  font-size: 14px;
+  color: #444;
+  margin: 2px 0;
+  word-wrap: break-word;
+}
+
+/* Upload button */
+.upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #007bff;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.upload-btn:hover {
+  background: #0056b3;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .file-list {
+    justify-content: center;
+  }
+  .file-card {
+    width: 100%;
+    max-width: 300px;
+  }
+}
