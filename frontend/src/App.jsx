@@ -63,17 +63,17 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen hero-pattern">
       {/* Upload Section */}
       <div 
-        className="flex items-center justify-center pt-10"
+        className="flex items-center justify-center pt-16 px-4"
         onDragEnter={handleDragEnter}
         onDragOver={(e) => e.preventDefault()}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <div className={`text-center ${isDragging ? 'upload-zone' : ''}`}>
-          <h1 className="text-4xl font-bold text-gray-800 mb-8 fade-in">
+        <div className={`text-center max-w-2xl w-full ${isDragging ? 'upload-zone' : 'card'}`}>
+          <h1 className="page-title mb-8">
             Document Management System
           </h1>
           
@@ -88,7 +88,7 @@ function App() {
             />
             <label
               htmlFor="fileInput"
-              className="btn-primary cursor-pointer inline-flex items-center space-x-2"
+              className="btn-primary cursor-pointer inline-flex items-center space-x-3"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -104,10 +104,10 @@ function App() {
 
       {/* Upload Progress */}
       {uploadProgress > 0 && uploadProgress < 100 && (
-        <div className="max-w-xl mx-auto mt-4 px-4">
-          <div className="bg-blue-100 rounded-full h-4 overflow-hidden">
+        <div className="max-w-xl mx-auto mt-8 px-4">
+          <div className="bg-indigo-100 rounded-full h-4 overflow-hidden">
             <div 
-              className="bg-blue-500 h-full transition-all duration-300"
+              className="bg-indigo-600 h-full transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
@@ -115,19 +115,24 @@ function App() {
       )}
 
       {/* Files Display Section */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-12">
         {Object.entries(groupedFiles).map(([fileType, filesOfType]) => (
-          <div key={fileType} className="mb-8 fade-in">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4 capitalize">
+          <div key={fileType} className="mb-12 fade-in">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 capitalize flex items-center">
+              <span className="text-indigo-600 mr-2">
+                <FileTypeIcon type={fileType} />
+              </span>
               {fileType} Files
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filesOfType.map((file, index) => (
                 <div key={index} className="file-card">
-                  <div className="flex items-center space-x-3">
-                    <FileIcon fileType={fileType} />
-                    <div>
-                      <p className="font-medium text-gray-800 truncate">
+                  <div className="flex items-center space-x-4">
+                    <div className="text-indigo-600 text-2xl">
+                      <FileIcon fileType={fileType} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-800 truncate">
                         {file.name}
                       </p>
                       <p className="text-sm text-gray-500">
@@ -170,6 +175,20 @@ function FileIcon({ fileType }) {
       />
     </svg>
   );
+}
+
+// Add a new component for file type icons
+function FileTypeIcon({ type }) {
+  const icons = {
+    pdf: "📄",
+    doc: "📝",
+    docx: "📝",
+    ppt: "📊",
+    pptx: "📊",
+    image: "🖼️",
+    others: "📁"
+  };
+  return icons[type] || icons.others;
 }
 
 export default App; 
