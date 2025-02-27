@@ -2,56 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/Home/Home';
 import Classify from './components/Classify/Classify';
 import Extract from './components/Extract/Extract';
+import Semantic from './components/Semantic/Semantic';
 
 function App() {
-  const SemanticComponent = () => (
-    <div className="min-h-screen hero-pattern">
-      <div className="container mx-auto px-4 py-16">
-        <h1 className="page-title mb-8">Semantic Understanding</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="card p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Topic Analysis</h2>
-            <p className="text-gray-600 mb-6">
-              Identify main topics and themes within documents using NLP.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {['Finance', 'Legal', 'Technology', 'Healthcare'].map(topic => (
-                <span key={topic} className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full">
-                  {topic}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="card p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Entity Recognition</h2>
-            <p className="text-gray-600 mb-6">
-              Extract and categorize named entities from documents.
-            </p>
-            <div className="space-y-3">
-              <div className="flex items-center">
-                <span className="w-20 text-sm text-gray-500">People</span>
-                <div className="flex-1 h-2 bg-indigo-100 rounded-full overflow-hidden">
-                  <div className="w-3/4 h-full bg-indigo-500"></div>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <span className="w-20 text-sm text-gray-500">Organizations</span>
-                <div className="flex-1 h-2 bg-indigo-100 rounded-full overflow-hidden">
-                  <div className="w-1/2 h-full bg-indigo-500"></div>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <span className="w-20 text-sm text-gray-500">Locations</span>
-                <div className="flex-1 h-2 bg-indigo-100 rounded-full overflow-hidden">
-                  <div className="w-2/3 h-full bg-indigo-500"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   const OrganizeComponent = () => (
     <div className="min-h-screen hero-pattern">
@@ -126,7 +79,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/classify" element={<Classify />} />
         <Route path="/extract" element={<Extract />} />
-        <Route path="/semantic" element={<SemanticComponent />} />
+        <Route path="/semantic" element={<Semantic />} />
         <Route path="/organize" element={<OrganizeComponent />} />
         <Route path="/manage" element={<ManageComponent />} />
       </Routes>
