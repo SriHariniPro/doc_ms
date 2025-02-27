@@ -1,9 +1,10 @@
-import './assets/styles.css';
 import { useState } from 'react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function App() {
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Group files by their type
   const groupedFiles = files.reduce((acc, file) => {
@@ -40,11 +41,39 @@ function App() {
     }
   };
 
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    handleFileUpload({ target: { files: droppedFiles } });
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Upload Section */}
-      <div className="flex items-center justify-center pt-10">
-        <div className="text-center">
+      <div 
+        className="flex items-center justify-center pt-10"
+        onDragEnter={handleDragEnter}
+        onDragOver={(e) => e.preventDefault()}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        <div className={`text-center p-8 rounded-lg transition-all duration-200 
+          ${isDragging ? 'bg-blue-50 border-2 border-dashed border-blue-400' : ''}`}>
           <h1 className="text-4xl font-bold text-gray-800 mb-8">
             Document Management System
           </h1>
@@ -56,29 +85,35 @@ function App() {
               id="fileInput"
               onChange={handleFileUpload}
               multiple
+              accept=".pdf,.doc,.docx,.ppt,.pptx,image/*"
             />
             <label
               htmlFor="fileInput"
               className="btn-primary cursor-pointer inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-200 ease-in-out transform hover:scale-105"
             >
-              <svg 
-                className="w-6 h-6" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                />
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
               <span>Upload Documents</span>
             </label>
+            <p className="mt-2 text-sm text-gray-500">
+              or drag and drop files here
+            </p>
           </div>
         </div>
       </div>
+
+      {/* Upload Progress */}
+      {uploadProgress > 0 && uploadProgress < 100 && (
+        <div className="max-w-xl mx-auto mt-4 px-4">
+          <div className="bg-blue-100 rounded-full h-4 overflow-hidden">
+            <div 
+              className="bg-blue-500 h-full transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Files Display Section */}
       <div className="container mx-auto px-4 py-8">
