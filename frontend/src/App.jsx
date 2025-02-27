@@ -78,6 +78,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/classify" element={<Classify />} />
         <Route path="/extract" element={<Extract />} />
+        <Route path="/semantic" element={<Semantic />} />
         <Route path="/organize" element={<OrganizeComponent />} />
         <Route path="/manage" element={<ManageComponent />} />
       </Routes>
