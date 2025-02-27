@@ -14,16 +14,12 @@ body {
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-indigo-600 text-white rounded-xl 
-    hover:bg-indigo-700 transition-all duration-300 
-    shadow-lg hover:shadow-indigo-500/30 
-    transform hover:-translate-y-0.5;
+    @apply px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 
+           transition-colors duration-200 flex items-center gap-2;
   }
   
   .card {
-    @apply p-6 bg-white/80 backdrop-blur-sm rounded-2xl 
-    shadow-xl hover:shadow-2xl transition-all duration-300
-    border border-white/20;
+    @apply bg-white rounded-lg shadow-md p-6;
   }
 
   .file-card {
@@ -44,17 +40,14 @@ body {
   }
 
   .page-title {
-    @apply text-white font-bold;
+    @apply text-4xl font-bold text-gray-900;
   }
-}
 
-.hero-pattern {
-  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShPoiGz5S1ktbmFb8R49fgTHLjnzLgGfDD1g&s');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  min-height: 100vh;
+  .hero-pattern {
+    background-color: #f8fafc;
+    background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
 }
 
 @keyframes fadeIn {
