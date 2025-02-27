@@ -17,10 +17,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "tailwind-merge": "^2.2.1",
-    "tesseract.js": "^5.0.5",
-    "pdf-parse": "^1.1.1",
-    "mammoth": "^1.6.0",
-    "sentiment": "^5.0.2"
+    "tesseract.js": "^5.0.5"
   },
   "devDependencies": {
     "@types/node": "^20.11.28",
