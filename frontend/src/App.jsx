@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/Home/Home';
 import Classify from './components/Classify/Classify';
 import Extract from './components/Extract/Extract';
-import Semantic from './components/Semantic/Semantic';
+
 
 function App() {
 
