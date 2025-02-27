@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import Tesseract from "tesseract.js";
-import pdfParse from "pdf-parse";
-import mammoth from "mammoth";
-import { Upload, FileText, CheckCircle, Loader2, XCircle } from "lucide-react";
+import { Upload, FileText, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 
@@ -10,8 +8,7 @@ const Extract = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [ocrResult, setOcrResult] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filePreview, setFilePreview] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [imageURL, setImageURL] = useState(null);
 
   const extractMetadata = (text) => {
     const dateRegex = /\b\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}\b/g;
@@ -29,7 +26,7 @@ const Extract = () => {
     const file = event.target.files[0];
     if (file) {
       setSelectedFile(file);
-      setFilePreview(URL.createObjectURL(file));
+      setImageURL(URL.createObjectURL(file));
     }
   };
 
@@ -50,7 +47,6 @@ const Extract = () => {
       ]);
     } catch (error) {
       console.error("OCR Error:", error);
-      setErrorMessage("An error occurred while processing the OCR. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -81,10 +77,10 @@ const Extract = () => {
               </label>
             </div>
 
-            {filePreview && (
+            {imageURL && (
               <div className="w-full max-w-md">
                 <img 
-                  src={filePreview} 
+                  src={imageURL} 
                   alt="Preview" 
                   className="w-full h-64 object-cover rounded-lg shadow-lg"
                 />
@@ -126,12 +122,6 @@ const Extract = () => {
                   </div>
                 </Card>
               ))}
-            </div>
-          )}
-
-          {errorMessage && (
-            <div className="mt-8 text-center text-red-500">
-              {errorMessage}
             </div>
           )}
         </div>
