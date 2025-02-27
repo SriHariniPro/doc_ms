@@ -1,44 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/Home/Home';
 import Classify from './components/Classify/Classify';
+import Extract from './components/Extract/Extract';
 
 function App() {
-  const ExtractComponent = () => (
-    <div className="min-h-screen hero-pattern">
-      <div className="container mx-auto px-4 py-16">
-        <h1 className="page-title mb-8">Intelligent Content Extraction</h1>
-        <div className="card p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">OCR Processing</h2>
-              <p className="text-gray-600 mb-6">
-                Extract text from images and scanned documents using advanced OCR technology.
-              </p>
-              <button className="btn-primary">Start OCR</button>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Metadata Generation</h2>
-              <p className="text-gray-600 mb-6">
-                Automatically extract key information like dates, names, and amounts.
-              </p>
-              <div className="space-y-2">
-                <div className="flex items-center text-gray-700">
-                  <span className="mr-2">📅</span> Dates
-                </div>
-                <div className="flex items-center text-gray-700">
-                  <span className="mr-2">👤</span> Names
-                </div>
-                <div className="flex items-center text-gray-700">
-                  <span className="mr-2">💰</span> Amounts
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   const SemanticComponent = () => (
     <div className="min-h-screen hero-pattern">
       <div className="container mx-auto px-4 py-16">
@@ -160,7 +125,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/classify" element={<Classify />} />
-        <Route path="/extract" element={<ExtractComponent />} />
+        <Route path="/extract" element={<Extract />} />
         <Route path="/semantic" element={<SemanticComponent />} />
         <Route path="/organize" element={<OrganizeComponent />} />
         <Route path="/manage" element={<ManageComponent />} />
