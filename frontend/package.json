@@ -3,11 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "browser": {
-    "fs": false,
-    "path": false,
-    "os": false
-  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -16,6 +11,7 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.0.2",
+    "axios": "^1.6.8",
     "clsx": "^2.1.0",
     "lucide-react": "^0.358.0",
     "react": "^18.2.0",
@@ -24,8 +20,7 @@
     "tailwind-merge": "^2.2.1",
     "tesseract.js": "^5.0.5",
     "pdf-parse": "^1.1.1",
-    "mammoth": "^1.6.0",
-    "sentiment": "^5.0.2"
+    "mammoth": "^1.6.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.28",
@@ -40,11 +35,16 @@
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "vite": "^5.1.6",
-    "stream-browserify": "^3.0.0",
-    "path-browserify": "^1.0.1",
-    "util": "^0.12.5",
-    "crypto-browserify": "^3.12.0",
+    "assert": "^2.1.0",
     "buffer": "^6.0.3",
-    "process": "^0.11.10"
+    "crypto-browserify": "^3.12.0",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "url": "^0.11.3",
+    "util": "^0.12.5"
   }
 }
