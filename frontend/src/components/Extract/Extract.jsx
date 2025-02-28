@@ -23,20 +23,30 @@ const Extract = () => {
       // First process the document locally
       const text = await processDocument(file);
       
-      // Create a form data object to send to the backend
+      // Create a form data object to send to the Flask backend
       const formData = new FormData();
       formData.append('file', file);
 
       // Send to Flask backend for analysis
-      const response = await axios.post('http://localhost:5000/analyze', formData, {
+      const analysisResponse = await axios.post('http://localhost:5000/analyze', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
 
+      const documentData = {
+        title: file.name,
+        content: text,
+        fileType: file.type,
+        analysis: analysisResponse.data
+      };
+
+      // Save to MongoDB through Node.js backend
+      await axios.post('http://localhost:3000/api/documents', documentData);
+
       setExtractedContent({
         text,
-        analysis: response.data
+        analysis: analysisResponse.data
       });
     } catch (error) {
       console.error('Error processing file:', error);
