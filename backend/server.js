@@ -6,10 +6,10 @@ import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
 import multer from 'multer';
 import { storage } from './services/storage.js';
-import { dirname } from 'path';
 
+// Get current file path and directory
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 const app = express();
