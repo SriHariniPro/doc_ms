@@ -4,7 +4,7 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const Semantic = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -41,24 +41,42 @@ const Semantic = () => {
     }
   };
 
+  const formatEntities = (entities) => {
+    return Object.entries(entities)
+      .map(([type, values]) => `${type}: ${values.join(", ")}`)
+      .join("\n");
+  };
+
   return (
     <div className="min-h-screen hero-pattern">
       <div className="container mx-auto px-4 py-16">
         <h1 className="text-center text-4xl mb-12">Semantic Analysis</h1>
         <div className="card max-w-4xl mx-auto p-8">
           <div className="flex flex-col items-center space-y-6">
-            <input
-              type="file"
-              accept=".pdf,.docx"
-              onChange={handleFileChange}
-              className="hidden"
-              id="file-upload"
+            <input 
+              type="file" 
+              accept=".pdf,.docx" 
+              onChange={handleFileChange} 
+              className="hidden" 
+              id="file-upload" 
             />
-            <label htmlFor="file-upload" className="btn-primary cursor-pointer flex items-center space-x-2">
+            <label 
+              htmlFor="file-upload" 
+              className="btn-primary cursor-pointer flex items-center space-x-2"
+            >
               <Upload className="w-5 h-5" />
               <span>Upload Document</span>
             </label>
-            <Button disabled={!selectedFile || loading} onClick={analyzeFile} className="mt-4">
+            {selectedFile && (
+              <p className="text-sm text-gray-600">
+                Selected: {selectedFile.name}
+              </p>
+            )}
+            <Button 
+              disabled={!selectedFile || loading} 
+              onClick={analyzeFile} 
+              className="mt-4"
+            >
               {loading ? (
                 <span className="flex items-center space-x-2">
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -94,4 +112,4 @@ const Semantic = () => {
   );
 };
 
-export default Semantic;
+export default Semantic; 
