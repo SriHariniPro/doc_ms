@@ -10,10 +10,39 @@ export default defineConfig({
       path: 'path-browserify',
       util: 'util',
       crypto: 'crypto-browserify',
+      http: 'stream-http',
+      https: 'https-browserify',
+      os: 'os-browserify/browser',
+      buffer: 'buffer',
+      process: 'process/browser',
+      fs: false,
+      net: false,
+      tls: false,
+      child_process: false,
+      worker_threads: false
     },
   },
   define: {
     'process.env': {},
     global: {},
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis'
+      }
+    },
+    include: ['pdf-parse', 'mammoth']
+  },
+  build: {
+    rollupOptions: {
+      external: ['fs', 'net', 'tls', 'child_process', 'worker_threads'],
+      output: {
+        manualChunks: {
+          'pdf-parse': ['pdf-parse'],
+          'mammoth': ['mammoth']
+        }
+      }
+    }
+  }
 })
