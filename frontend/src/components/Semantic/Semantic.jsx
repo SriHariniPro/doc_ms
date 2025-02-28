@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Upload, CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import natural from 'natural';
 import Sentiment from 'sentiment';
 import nlp from 'compromise';
-import * as pdfjs from 'pdfjs-dist';
-import mammoth from 'mammoth';
 
 const Semantic = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -25,8 +23,12 @@ const Semantic = () => {
   const extractText = async (file) => {
     try {
       if (file.type === 'application/pdf') {
+        const { default: pdfjsLib } = await import('pdfjs-dist');
+        // Initialize PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        
         const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         let text = '';
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
@@ -35,11 +37,12 @@ const Semantic = () => {
         }
         return text;
       } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        const { default: mammoth } = await import('mammoth');
         const arrayBuffer = await file.arrayBuffer();
         const result = await mammoth.extractRawText({ arrayBuffer });
         return result.value;
       }
-      throw new Error('Unsupported file type');
+      throw new Error('Unsupported file type. Please upload a PDF or DOCX file.');
     } catch (error) {
       console.error('Text extraction error:', error);
       throw new Error('Failed to extract text from file');
@@ -111,10 +114,10 @@ const Semantic = () => {
   };
 
   return (
-    <div className="min-h-screen hero-pattern">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-16">
-        <h1 className="text-center text-4xl mb-12">Semantic Analysis</h1>
-        <div className="card max-w-4xl mx-auto p-8">
+        <h1 className="text-center text-4xl font-bold text-gray-900 mb-12">Semantic Analysis</h1>
+        <div className="bg-white rounded-lg shadow-lg max-w-4xl mx-auto p-8">
           <div className="flex flex-col items-center space-y-6">
             <input 
               type="file" 
@@ -125,7 +128,7 @@ const Semantic = () => {
             />
             <label 
               htmlFor="file-upload" 
-              className="btn-primary cursor-pointer flex items-center space-x-2"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 cursor-pointer flex items-center space-x-2"
             >
               <Upload className="w-5 h-5" />
               <span>Upload Document</span>
@@ -138,7 +141,7 @@ const Semantic = () => {
             <Button 
               disabled={!selectedFile || loading} 
               onClick={analyzeFile} 
-              className="mt-4"
+              className="bg-indigo-600 text-white"
             >
               {loading ? (
                 <span className="flex items-center space-x-2">
@@ -159,13 +162,24 @@ const Semantic = () => {
           )}
 
           {analysisResult && (
-            <Card className="mt-8 p-4">
-              <CardContent>
-                <h3 className="text-lg font-semibold">Sentiment: {analysisResult.sentiment}</h3>
-                <h3 className="mt-4 text-lg font-semibold">Topics:</h3>
-                <p>{analysisResult.topics.join(", ")}</p>
-                <h3 className="mt-4 text-lg font-semibold">Named Entities:</h3>
-                <pre>{JSON.stringify(analysisResult.entities, null, 2)}</pre>
+            <Card className="mt-8">
+              <CardContent className="p-6">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Sentiment</h3>
+                    <p className="mt-2 text-gray-600">{analysisResult.sentiment}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Topics</h3>
+                    <p className="mt-2 text-gray-600">{analysisResult.topics.join(", ")}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Named Entities</h3>
+                    <pre className="mt-2 p-4 bg-gray-50 rounded-md overflow-auto text-sm text-gray-600">
+                      {JSON.stringify(analysisResult.entities, null, 2)}
+                    </pre>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )}
