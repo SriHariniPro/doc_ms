@@ -3,17 +3,20 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const fileRoutes = require('./routes/file.routes');
+const documentRoutes = require('./routes/document.routes');
 const path = require('path');
 const fs = require('fs').promises;
 
 const app = express();
 
+// CORS Configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' ? 'your-production-domain' : 'http://localhost:5173',
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -36,13 +39,18 @@ const createUploadsDir = async () => {
 };
 createUploadsDir();
 
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api', fileRoutes);
+// Routes
+app.use('/api/files', fileRoutes);
+app.use('/api/documents', documentRoutes);
 
+// Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, process.env.UPLOAD_DIR)));
 
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
@@ -51,6 +59,7 @@ app.use((err, req, res, next) => {
   });
 });
 
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
