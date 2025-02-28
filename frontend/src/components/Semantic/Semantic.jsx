@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Upload, CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
-import axios from "axios";
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+import natural from 'natural';
+import Sentiment from 'sentiment';
+import nlp from 'compromise';
+import * as pdfjs from 'pdfjs-dist';
+import mammoth from 'mammoth';
 
 const Semantic = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -20,43 +22,92 @@ const Semantic = () => {
     }
   };
 
+  const extractText = async (file) => {
+    try {
+      if (file.type === 'application/pdf') {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+        let text = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          text += content.items.map(item => item.str).join(' ');
+        }
+        return text;
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        return result.value;
+      }
+      throw new Error('Unsupported file type');
+    } catch (error) {
+      console.error('Text extraction error:', error);
+      throw new Error('Failed to extract text from file');
+    }
+  };
+
+  const analyzeSentiment = (text) => {
+    const sentiment = new Sentiment();
+    const result = sentiment.analyze(text);
+    return result.score > 0 ? "Positive" : result.score < 0 ? "Negative" : "Neutral";
+  };
+
+  const extractEntities = (text) => {
+    const doc = nlp(text);
+    return {
+      PERSON: doc.people().out('array'),
+      ORGANIZATION: doc.organizations().out('array'),
+      PLACE: doc.places().out('array'),
+      DATE: doc.dates().out('array')
+    };
+  };
+
+  const extractTopics = (text) => {
+    const TfIdf = natural.TfIdf;
+    const tfidf = new TfIdf();
+    
+    // Tokenize and add document
+    const tokenizer = new natural.WordTokenizer();
+    const tokens = tokenizer.tokenize(text.toLowerCase());
+    tfidf.addDocument(tokens);
+
+    // Get top terms
+    const topics = [];
+    tfidf.listTerms(0).slice(0, 10).forEach(item => {
+      topics.push(item.term);
+    });
+
+    return topics;
+  };
+
   const analyzeFile = async () => {
     if (!selectedFile) return;
     setLoading(true);
     setError(null);
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
     try {
-      console.log("Uploading file:", selectedFile.name); // Debug log
-      const response = await axios.post(`${API_URL}/analyze`, formData, {
-        headers: { 
-          "Content-Type": "multipart/form-data"
-        },
+      // Extract text from file
+      const text = await extractText(selectedFile);
+      if (!text) {
+        throw new Error('No text could be extracted from the file');
+      }
+
+      // Perform analysis
+      const sentiment = analyzeSentiment(text);
+      const entities = extractEntities(text);
+      const topics = extractTopics(text);
+
+      setAnalysisResult({
+        sentiment,
+        entities,
+        topics
       });
-      console.log("Response:", response.data); // Debug log
-      setAnalysisResult(response.data);
     } catch (error) {
-      console.error("Error details:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
-      });
-      setError(
-        error.response?.data?.error || 
-        error.message || 
-        "Error processing file"
-      );
+      console.error('Analysis error:', error);
+      setError(error.message || 'Error processing file');
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatEntities = (entities) => {
-    return Object.entries(entities)
-      .map(([type, values]) => `${type}: ${values.join(", ")}`)
-      .join("\n");
   };
 
   return (
