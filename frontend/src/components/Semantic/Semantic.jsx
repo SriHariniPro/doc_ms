@@ -29,13 +29,25 @@ const Semantic = () => {
     formData.append("file", selectedFile);
 
     try {
+      console.log("Uploading file:", selectedFile.name); // Debug log
       const response = await axios.post(`${API_URL}/analyze`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          "Content-Type": "multipart/form-data"
+        },
       });
+      console.log("Response:", response.data); // Debug log
       setAnalysisResult(response.data);
     } catch (error) {
-      console.error("Error analyzing file:", error);
-      setError(error.response?.data?.error || "Error processing file");
+      console.error("Error details:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      setError(
+        error.response?.data?.error || 
+        error.message || 
+        "Error processing file"
+      );
     } finally {
       setLoading(false);
     }
