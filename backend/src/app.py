@@ -13,15 +13,15 @@ from io import BytesIO
 load_dotenv()  # Load environment variables
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})  # Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 nlp = spacy.load("en_core_web_sm")
 analyzer = SentimentIntensityAnalyzer()
 
+# Add a health check route
 @app.route("/", methods=["GET"])
 def health_check():
     return jsonify({"status": "healthy", "message": "Semantic analysis service is running"})
-
 
 def extract_text(file):
     text = ""
@@ -33,13 +33,11 @@ def extract_text(file):
         text = " ".join([para.text for para in doc.paragraphs])
     return text.strip()
 
-
 def analyze_sentiment(text):
     if not text:
         return "No content available"
     score = analyzer.polarity_scores(text)
     return "Positive" if score['compound'] > 0 else "Negative" if score['compound'] < 0 else "Neutral"
-
 
 def extract_entities(text):
     doc = nlp(text)
@@ -49,7 +47,6 @@ def extract_entities(text):
             entities[ent.label_] = []
         entities[ent.label_].append(ent.text)
     return entities
-
 
 def extract_topics(text):
     try:
@@ -64,7 +61,6 @@ def extract_topics(text):
         return topics
     except Exception as e:
         return [f"Error extracting topics: {str(e)}"]
-
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
@@ -89,8 +85,8 @@ def analyze():
         "topics": topics
     })
 
-
 if __name__ == "__main__":
+    # Use environment variables with defaults
     port = int(os.getenv('FLASK_PORT', 5000))
     debug = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    app.run(host='0.0.0.0', port=port, debug=debug) 
