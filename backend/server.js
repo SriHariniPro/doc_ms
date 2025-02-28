@@ -14,6 +14,12 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 const app = express();
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
 // CORS Configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' ? 'your-production-domain' : 'http://localhost:5173',
@@ -61,6 +67,11 @@ createDirectories();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Health check route
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Server is running' });
+});
+
 // Document routes
 app.post('/api/documents', upload.single('file'), async (req, res) => {
   try {
@@ -78,6 +89,7 @@ app.post('/api/documents', upload.single('file'), async (req, res) => {
 
     res.status(201).json(result);
   } catch (error) {
+    console.error('Error in POST /api/documents:', error);
     res.status(500).json({
       message: 'Error saving document',
       error: error.message
@@ -101,6 +113,7 @@ app.get('/api/documents', async (req, res) => {
       totalDocuments: documents.length
     });
   } catch (error) {
+    console.error('Error in GET /api/documents:', error);
     res.status(500).json({
       message: 'Error retrieving documents',
       error: error.message
@@ -116,6 +129,7 @@ app.get('/api/documents/:id', async (req, res) => {
     }
     res.status(200).json(document);
   } catch (error) {
+    console.error(`Error in GET /api/documents/${req.params.id}:`, error);
     res.status(500).json({
       message: 'Error retrieving document',
       error: error.message
@@ -131,6 +145,7 @@ app.delete('/api/documents/:id', async (req, res) => {
     }
     res.status(200).json({ message: 'Document deleted successfully' });
   } catch (error) {
+    console.error(`Error in DELETE /api/documents/${req.params.id}:`, error);
     res.status(500).json({
       message: 'Error deleting document',
       error: error.message
@@ -143,7 +158,7 @@ app.use('/uploads', express.static(path.join(__dirname, process.env.UPLOAD_DIR |
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Error:', err.stack);
   if (err instanceof multer.MulterError) {
     return res.status(400).json({
       message: 'File upload error',
@@ -158,10 +173,17 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use((req, res) => {
+  console.log(`404 - Route not found: ${req.method} ${req.url}`);
   res.status(404).json({ message: 'Route not found' });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log('Available routes:');
+  console.log('GET    /');
+  console.log('GET    /api/documents');
+  console.log('POST   /api/documents');
+  console.log('GET    /api/documents/:id');
+  console.log('DELETE /api/documents/:id');
 }); 
