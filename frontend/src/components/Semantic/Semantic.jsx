@@ -21,17 +21,27 @@ const Semantic = () => {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      // Send to Flask backend for analysis
-      const response = await axios.post('http://localhost:5000/analyze', formData, {
+      // First, upload to Node.js backend for storage
+      const uploadResponse = await axios.post('http://localhost:3000/api/documents', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
 
-      setAnalysis(response.data);
+      // Then send to Flask backend for analysis
+      const analysisResponse = await axios.post('http://localhost:5000/analyze', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      setAnalysis({
+        ...analysisResponse.data,
+        documentId: uploadResponse.data.id
+      });
     } catch (error) {
-      console.error('Error analyzing file:', error);
-      setError(error.message || 'Error analyzing file');
+      console.error('Error processing file:', error);
+      setError(error.response?.data?.message || error.message || 'Error processing file');
     } finally {
       setLoading(false);
     }
