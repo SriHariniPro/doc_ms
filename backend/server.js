@@ -4,7 +4,9 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
+import multer from 'multer';
 import { storage } from './services/storage.js';
+import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,26 +21,61 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Create uploads directory if it doesn't exist
-const createUploadsDir = async () => {
-  const uploadsDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
-  try {
-    await fs.access(uploadsDir);
-  } catch {
-    await fs.mkdir(uploadsDir, { recursive: true });
-    console.log('Created uploads directory');
+// Configure multer for file uploads
+const upload = multer({
+  dest: path.join(__dirname, process.env.UPLOAD_DIR || 'uploads'),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type'));
+    }
+  }
+});
+
+// Create required directories
+const createDirectories = async () => {
+  const dirs = [
+    path.join(__dirname, process.env.UPLOAD_DIR || 'uploads'),
+    path.join(__dirname, 'data'),
+    path.join(__dirname, 'data/documents'),
+    path.join(__dirname, 'data/analysis')
+  ];
+
+  for (const dir of dirs) {
+    try {
+      await fs.access(dir);
+    } catch {
+      await fs.mkdir(dir, { recursive: true });
+      console.log(`Created directory: ${dir}`);
+    }
   }
 };
-createUploadsDir();
+createDirectories();
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Document routes
-app.post('/api/documents', async (req, res) => {
+app.post('/api/documents', upload.single('file'), async (req, res) => {
   try {
-    const result = await storage.saveDocument(req.body);
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const result = await storage.saveDocument({
+      title: req.file.originalname,
+      content: req.body.content || '',
+      fileType: req.file.mimetype,
+      filePath: req.file.path,
+      analysis: req.body.analysis
+    });
+
     res.status(201).json(result);
   } catch (error) {
     res.status(500).json({
@@ -50,10 +87,18 @@ app.post('/api/documents', async (req, res) => {
 
 app.get('/api/documents', async (req, res) => {
   try {
+    const { page = 1, limit = 10 } = req.query;
     const documents = await storage.getAllDocuments();
+    
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const paginatedDocs = documents.slice(startIndex, endIndex);
+
     res.status(200).json({
-      documents,
-      total: documents.length
+      documents: paginatedDocs,
+      currentPage: Number(page),
+      totalPages: Math.ceil(documents.length / limit),
+      totalDocuments: documents.length
     });
   } catch (error) {
     res.status(500).json({
@@ -99,6 +144,12 @@ app.use('/uploads', express.static(path.join(__dirname, process.env.UPLOAD_DIR |
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({
+      message: 'File upload error',
+      error: err.message
+    });
+  }
   res.status(500).json({
     message: 'Internal Server Error',
     error: process.env.NODE_ENV === 'development' ? err.message : {}
