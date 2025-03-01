@@ -20,7 +20,13 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={
+    r"/*": {
+        "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+        "methods": ["GET", "POST", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 
 # Load NLP models
 try:
@@ -39,7 +45,7 @@ def allowed_file(filename):
 @app.route("/", methods=["GET"])
 def health_check():
     return jsonify({
-        "status": "healthy",
+        "status": "ok",
         "message": "Semantic analysis service is running",
         "nlp_model_loaded": nlp is not None,
         "sentiment_analyzer_loaded": analyzer is not None
