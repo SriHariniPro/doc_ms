@@ -4,8 +4,8 @@ import { Card, CardContent } from "../../components/ui/card";
 import axios from "axios";
 
 // API endpoints
-const NODE_API = 'http://localhost:3000';
-const FLASK_API = 'http://localhost:5000';
+const NODE_API = import.meta.env.VITE_NODE_API_URL || 'http://localhost:3000';
+const FLASK_API = import.meta.env.VITE_FLASK_API_URL || 'http://localhost:5000';
 
 const Extract = () => {
   const [selectedFile, setSelectedFile] = useState(null);
