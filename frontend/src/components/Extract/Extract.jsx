@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { Upload, FileText, CheckCircle, Loader2 } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Upload, FileText, Loader2 } from "lucide-react";
 import { Card, CardContent } from "../../components/ui/card";
-import { processDocument } from "../../utils/documentProcessor";
 import axios from "axios";
 
 const Extract = () => {
@@ -20,9 +18,6 @@ const Extract = () => {
     setLoading(true);
 
     try {
-      // First process the document locally
-      const text = await processDocument(file);
-      
       // Create a form data object to send to the Flask backend
       const formData = new FormData();
       formData.append('file', file);
@@ -34,23 +29,24 @@ const Extract = () => {
         }
       });
 
-      const documentData = {
-        title: file.name,
-        content: text,
-        fileType: file.type,
-        analysis: analysisResponse.data
-      };
-
-      // Save to MongoDB through Node.js backend
-      await axios.post('http://localhost:3000/api/documents', documentData);
+      // Save to Node.js backend
+      const documentFormData = new FormData();
+      documentFormData.append('file', file);
+      documentFormData.append('analysis', JSON.stringify(analysisResponse.data));
+      
+      const uploadResponse = await axios.post('http://localhost:3000/api/documents', documentFormData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
 
       setExtractedContent({
-        text,
+        text: analysisResponse.data.text,
         analysis: analysisResponse.data
       });
     } catch (error) {
       console.error('Error processing file:', error);
-      setError(error.message || 'Error processing file');
+      setError(error.response?.data?.message || error.message || 'Error processing file');
     } finally {
       setLoading(false);
     }
