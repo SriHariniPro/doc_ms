@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 
 // CORS Configuration
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: '*',  // Allow all origins in development
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
